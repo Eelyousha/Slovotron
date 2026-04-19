@@ -69,10 +69,6 @@ async function generate_secret_word() {
 
         const data = await kontekstno_query({ method: 'random-challenge' });
         room_id = data.id;
-        current_secret_word_data = {
-            challenge_id: room_id,
-            secret_word: data.word || data.secret_word || data.answer || null
-        };
 
         // Проверка на забагованное слово.
         // Если для "банан" возвращается 0, значит игра сломана и надо перезапустить.
@@ -87,6 +83,22 @@ async function generate_secret_word() {
                 console.warn(`Слово ID ${room_id} забаговано (дистанция для "банан" = 0). Попытка ${retry_count + 1}/${max_retries}...`);
                 retry_count++;
             } else {
+                let secret_word = null;
+                try {
+                    const secretWordResponse = await kontekstno_query({
+                        method: 'tip',
+                        challenge_id: room_id,
+                        last_word_rank: 1
+                    });
+                    secret_word = secretWordResponse.word || null;
+                } catch (secretWordError) {
+                    console.warn('Не удалось получить секретное слово через tip(last_word_rank=1):', secretWordError);
+                }
+
+                current_secret_word_data = {
+                    challenge_id: room_id,
+                    secret_word: secret_word
+                };
                 is_bugged = false;
             }
         } catch (e) {
