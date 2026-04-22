@@ -2,6 +2,7 @@ const BG_DB_NAME = 'slovotron-bg';
 const BG_STORE_NAME = 'images';
 const BG_KEY = 'custom-bg';
 const BG_OPACITY_KEY = 'bg_opacity';
+const BG_DEFAULT_OPACITY = 75;
 const BG_MAX_SIZE = 10 * 1024 * 1024; // 10 МБ
 
 let bgObjectUrl = null;
@@ -91,7 +92,7 @@ async function initBackground() {
         if (!blob) return;
 
         bgObjectUrl = URL.createObjectURL(blob);
-        const opacity = parseInt(localStorage.getItem(BG_OPACITY_KEY), 10) || 100;
+        const opacity = parseInt(localStorage.getItem(BG_OPACITY_KEY), 10) || BG_DEFAULT_OPACITY;
         applyBgToDOM(bgObjectUrl, opacity);
         showBgOpacityControls(opacity);
         if (bgFileName) bgFileName.textContent = 'Изображение загружено';
@@ -118,7 +119,7 @@ if (bgFileInput) {
             await saveBgBlob(file);
             if (bgObjectUrl) URL.revokeObjectURL(bgObjectUrl);
             bgObjectUrl = URL.createObjectURL(file);
-            const opacity = parseInt(localStorage.getItem(BG_OPACITY_KEY), 10) || 100;
+            const opacity = parseInt(localStorage.getItem(BG_OPACITY_KEY), 10) || BG_DEFAULT_OPACITY;
             applyBgToDOM(bgObjectUrl, opacity);
             showBgOpacityControls(opacity);
             if (bgFileName) bgFileName.textContent = file.name;
@@ -144,7 +145,7 @@ if (bgClearBtn) {
 
 if (bgOpacitySlider) {
     bgOpacitySlider.addEventListener('input', () => {
-        const opacity = parseInt(bgOpacitySlider.value, 10) || 100;
+        const opacity = parseInt(bgOpacitySlider.value, 10) || BG_DEFAULT_OPACITY;
         if (bgEl) bgEl.style.opacity = opacity / 100;
         if (bgOpacityValue) bgOpacityValue.textContent = opacity + '%';
         localStorage.setItem(BG_OPACITY_KEY, opacity);
