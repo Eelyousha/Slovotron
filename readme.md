@@ -58,3 +58,6 @@
 **Ветки:**
 - `dev` — все доработки и фичи закидывать сюда через Pull Request
 - `main` — стабильная версия, автоматически деплоится на [slovotron.fra3a.ru](https://slovotron.fra3a.ru) через GitHub Actions
+
+**Параметры без визуального интерфейса:**
+- [PR #99](https://github.com/AnnaCodit/Slovotron/pull/99) — Вебхук + снижение непрозрачности при отсутствии активности
