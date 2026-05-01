@@ -247,6 +247,17 @@ footer.tech-things {
     color: #555;
 }
 
+footer.obs-overlay-footer {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+footer.obs-overlay-footer button {
+    max-width: fit-content;
+}
+
 .ui-cols {
     display: flex;
     align-items: flex-start;
@@ -434,6 +445,10 @@ body.has-custom-bg #info {
 
 .obs-overlay section {
     margin-bottom: 30px;
+}
+
+.obs-overlay .obs-overlay-footer {
+    display: flex;
 }
 
 .obs-overlay #winner .title {

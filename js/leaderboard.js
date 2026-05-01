@@ -66,7 +66,15 @@ function renderLeaderboard() {
 }
 
 function resetLeaderboard() {
-    if (confirm('Вы уверены, что хотите сбросить таблицу лидеров?')) {
+    let doReset = false;
+    if (document.body.classList.contains('obs-overlay')) {
+        doReset = true;
+    } else {
+        if (confirm('Вы уверены, что хотите сбросить таблицу лидеров?')) {
+            doReset = true;
+        }
+    }
+    if (doReset) {
         localStorage.removeItem(LEADERBOARD_KEY);
         renderLeaderboard();
     }
@@ -94,9 +102,9 @@ if (leaderboardBtn) {
     });
 }
 
-const resetLeaderboardBtn = document.getElementById('reset-leaderboard-btn');
-if (resetLeaderboardBtn) {
-    resetLeaderboardBtn.addEventListener('click', resetLeaderboard);
+const resetLeaderboardBtns = document.querySelectorAll('.reset-leaderboard-btn');
+for (const btn of resetLeaderboardBtns) {
+    btn.addEventListener('click', resetLeaderboard);
 }
 
 function pad(val) { return val > 9 ? val : "0" + val; }
