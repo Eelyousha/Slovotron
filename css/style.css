@@ -431,12 +431,12 @@ body.has-custom-bg #info {
 }
 
 /* Специальные стили для режима obs-overlay */
-/* .obs-overlay nav,
+/* .obs-overlay nav */
 .obs-overlay #info,
 .obs-overlay footer.main,
 .obs-overlay footer.tech-things {
     display: none;
-} */
+}
 
 .obs-overlay nav li:not(#menu-timer) {
     display: none !important;
