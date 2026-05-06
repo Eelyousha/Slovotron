@@ -93,6 +93,7 @@ function loadSettings() {
     }
 
     webhook_url = (urlParams.get('webhook_url') || '').trim();
+    webhook_secret = (urlParams.get('webhook_secret') || '').trim();
 
     const idleTimeoutParam = urlParams.get('inactive_timeout') || urlParams.get('inactivity_timeout');
     if (idleTimeoutParam !== null) {

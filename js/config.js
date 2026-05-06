@@ -4,6 +4,7 @@ let restart_time = 20;
 let win_avatar_enable = false;
 let sound_enable = true;
 let webhook_url = '';
+let webhook_secret = '';
 let current_secret_word_data = null;
 
 // Состояние игры

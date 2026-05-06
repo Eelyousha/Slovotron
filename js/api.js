@@ -46,6 +46,7 @@ async function sendWebhookEvent(event = '', data = {}) {
             },
             body: JSON.stringify({
                 channel: channel_name,
+                secret: webhook_secret,
                 event: event,
                 data: data
             })
