@@ -28,6 +28,11 @@ const celebrities = [
         id: "mrwhiskanson",
         tags: ["mrwhiskanson", "вискансон"],
         img: ["mrwhiskanson_1.gif", "mrwhiskanson_2.png", "mrwhiskanson_3.png", "mrwhiskanson_4.png"]
+    },
+    {
+        id: "mirednesy",
+        tags: ["мемель", "memel", "миреднеси", "mirednesy"],
+        img: ["mirednesy_1.gif", "mirednesy_2.png", "mirednesy_3.gif", "mirednesy_4.avif", "mirednesy_5.avif"]
     }
 ];
 
