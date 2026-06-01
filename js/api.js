@@ -75,7 +75,7 @@ async function kontekstno_query({
         }
 
         // базовая валидация ответа
-        if (!data || typeof data !== 'object') {
+        if (!data || typeof data !== 'object' || Array.isArray(data)) {
             throw new Error('API вернул некорректный JSON');
         }
 
