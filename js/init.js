@@ -15,7 +15,7 @@ function create_chat_connection(channel_name = '') {
 
     // Слушаем сообщения
     // user — это объект со всей инфой (цвет ника, бейджи, id сообщения и т.д.)
-    tmi_client.on('message', (channel, user, message, self) => {
+    tmi_client.on('message', async (channel, user, message, self) => {
 
         // console.log(channel, user, message);
 
@@ -26,6 +26,24 @@ function create_chat_connection(channel_name = '') {
         // проверка на подсказку, дальше не идем
         if (message.toLowerCase().startsWith('!подска') || message.toLowerCase().startsWith('! подска')) {
             use_tip(user['username']);
+            return;
+        }
+
+        // Проверяем на действия модераторов
+        const isModerator =
+            user.badges?.broadcaster ||
+            user.badges?.lead_moderator ||
+            user.badges?.moderator;
+
+        const command = message.toLowerCase();
+
+        if (isModerator && (command.startsWith('!sres') || command.startsWith('!словотрон-рес'))) {
+            reset_round();
+            secret_word_id = await generate_secret_word();
+            sendWebhookEvent('game-new', {
+                challenge_id: secret_word_id,
+                secret_word: current_secret_word_data?.secret_word || null
+            });
             return;
         }
 
