@@ -79,39 +79,46 @@ async function process_message(user, nickname_color, word, force_win = false) {
                 uniqUsers.add(user.username);
                 emit('uniqueGuessersAmountChanged');
             }
-            repeatWords++
+            repeatWords++;
         }
         // добавить слово в колонку .guessing .last-words в верх списка
         addTextToLastWords(word + ' уже было использовано');
         // console.log(`Слово "${word}" уже было проверено.`);
-        return
+        return;
     }
 
     // Если слова нет — выполняем логику
     console.log(`Новое слово: ${word}. Обрабатываю...`);
     markOverlayActivity();
 
-    if (force_win) {
-        word_check = { distance: 1 };
-    } else {
-        word_check = await kontekstno_query({
-            method: 'score',
-            word: word,
-            challenge_id: secret_word_id
-        });
+    let word_check;
+
+    try {
+        if (force_win) {
+            word_check = { distance: 1 };
+        } else {
+            word_check = await kontekstno_query({
+                method: 'score',
+                word: word,
+                challenge_id: secret_word_id
+            });
+        }
+    } catch (err) {
+        console.warn('Ошибка kontekstno_query:', err);
+        addTextToLastWords(word + ' ошибка API');
+        return;
     }
-    // console.log(word_check);
 
     checked_words.set(word, { distance: word_check.distance });
 
     if (!word_check.distance) {
         addTextToLastWords(word + ' не найдено в словаре');
         // console.log(`Слово "${word}" не имеет дистанци.`);
-        return
+        return;
     }
 
     if (word_check.distance < best_found_distance) {
-        console.log('Щас мы запишем новую дистанцию из обычного процессинга слова:', word_check.distance);
+        console.log('Новая лучшая дистанция:', word_check.distance);
         best_found_distance = word_check.distance;
     }
 
@@ -120,11 +127,15 @@ async function process_message(user, nickname_color, word, force_win = false) {
         // if (typeof update_tip_progress === 'function') update_tip_progress();
         emit('uniqueGuessersAmountChanged');
     }
-    uniqWords++
+    uniqWords++;
 
     // готовый html шаблон слова
-    const new_message = message_template(word, word_check.distance, user['display-name'], nickname_color);
-
+    const new_message = message_template(
+        word,
+        word_check.distance,
+        user['display-name'],
+        nickname_color
+    );
     // добавить слово в колонку .guessing .last-words в верх списка
     addAnythingToLastWords(new_message);
 
