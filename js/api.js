@@ -9,30 +9,89 @@ async function kontekstno_query({
     const BASE_DOMAIN = 'https://api.contextno.com/';
 
     // 1. Создаем объект URL. Он сам склеит домен и метод правильно.
-    // Если method пустой, просто будет запрос на корень, можно добавить проверку при желании.
+    if (!method) {
+        throw new Error('kontekstno_query: method не указан');
+    }
+
     const url = new URL(method, BASE_DOMAIN);
 
     // 2. Добавляем параметры в зависимости от метода
-    if (method === 'score') {
-        url.searchParams.append('challenge_id', challenge_id);
-        url.searchParams.append('word', word);
-        url.searchParams.append('challenge_type', 'random');
-    }
-    else if (method === 'tip') {
-        url.searchParams.append('challenge_id', challenge_id);
-        url.searchParams.append('last_word_rank', last_word_rank);
-        url.searchParams.append('challenge_type', 'random');
-    }
-    // Для 'random-challenge' параметры не нужны, url остается чистым
+    switch (method) {
 
-    // 3. Делаем запрос
-    const response = await fetch(url);
+        case 'score':
+            url.searchParams.set('challenge_id', challenge_id);
+            url.searchParams.set('word', word);
+            url.searchParams.set('challenge_type', 'random');
+            break;
 
-    if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
+        case 'tip':
+            url.searchParams.set('challenge_id', challenge_id);
+            url.searchParams.set('last_word_rank', last_word_rank);
+            url.searchParams.set('challenge_type', 'random');
+            break;
+
+        // Для 'random-challenge' параметры не нужны, url остается чистым
+        case 'random-challenge':
+            break;
+
+        default:
+            throw new Error(`Неизвестный method: ${method}`);
     }
 
-    return await response.json();
+    // Таймаут для запроса
+    const controller = new AbortController();
+
+    const timeout = setTimeout(() => {
+        controller.abort();
+    }, 10000);
+
+    try {
+        // 3. Делаем запрос
+        const response = await fetch(url, {
+            signal: controller.signal,
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            let errorText = '';
+            try {
+                errorText = await response.text();
+                if (errorText.length > 200) {
+                    errorText = errorText.substring(0, 200) + '...';
+                }
+            } catch {}
+            throw new Error(
+                `HTTP ${response.status} ${response.statusText} ${errorText}`
+            );
+        }
+
+        let data;
+
+        try {
+            data = await response.json();
+        } catch (jsonError) {
+            throw new Error(
+                `Ошибка парсинга JSON: ${jsonError.message}`
+            );
+        }
+
+        // базовая валидация ответа
+        if (!data || typeof data !== 'object' || Array.isArray(data)) {
+            throw new Error('API вернул некорректный JSON');
+        }
+
+        return data;
+
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            throw new Error('Таймаут запроса к Contextno API');
+        }
+        throw error;
+    } finally {
+        clearTimeout(timeout);
+    }
 }
 
 async function sendWebhookEvent(event = '', data = {}) {
